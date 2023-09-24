@@ -30,7 +30,7 @@ class RestaurantResource(Resource):
         return jsonify({'restaurants': restaurants})
     
     def post(self):
-        try:
+       
             data = request.get_json()
             new_restaurant = Restaurant(
                 name=data['name'],
@@ -42,8 +42,7 @@ class RestaurantResource(Resource):
 
             return jsonify(new_restaurant.to_dict()), 201
 
-        except Exception as e:
-            return jsonify({'error': str(e)}), 400
+        
         
         
 
