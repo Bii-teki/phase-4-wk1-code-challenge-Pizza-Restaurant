@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, make_response
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
-from models import db, Restaurant, Pizza, RestaurantPizza
+from .models import db, Restaurant, Pizza, RestaurantPizza
 from flask import jsonify
 import random
 
@@ -24,10 +24,26 @@ class Index(Resource):
 api.add_resource(Index, '/')
 
 class RestaurantResource(Resource):
-  
     def get(self):
-        restaurants = [restaurant.to_dict() for restaurant in Restaurant.query.all()]
-        return jsonify({'restaurants': restaurants})
+        restaurants = Restaurant.query.all()
+
+        restaurant_list = []
+
+        for restaurant in restaurants:
+            pizzas = Pizza.query.join(RestaurantPizza).filter(RestaurantPizza.restaurants_id == restaurant.id).all()
+            pizza_dict = [pizza.to_dict() for pizza in pizzas]
+
+            restaurant_dict = {
+                "id": restaurant.id,
+                "name": restaurant.name,
+                "address": restaurant.address,
+                "pizzas": pizza_dict
+            }
+            restaurant_list.append(restaurant_dict)
+
+        return make_response(jsonify({'restaurants': restaurant_list}), 200)
+
+
     
     def post(self):
        
@@ -66,9 +82,7 @@ class RestaurantByID(Resource):
         db.session.commit()
                 
         response_dict = {"message": "Restaurant successfully deleted"}
-
         response = make_response(jsonify(response_dict), 200)
-
         return response
     
     
@@ -189,4 +203,4 @@ api.add_resource(RestaurantPizzaResource, '/restaurantpizzas')
 
 
 if __name__ == "__main__":
-    app.run(port=5550, debug=True)
+    app.run(port=5578, debug=True)

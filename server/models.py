@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import validates
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.associationproxy import association_proxy
 
 
 
@@ -16,13 +17,15 @@ class Restaurant(db.Model, SerializerMixin):
     created_at= db.Column(db.DateTime, server_default=db.func.now())
     updated_at= db.Column(db.DateTime, onupdate=db.func.now())
     
-    restaurant_pizzas = db.relationship("RestaurantPizza", backref="restaurants")
+    restaurant_pizzas = db.relationship("RestaurantPizza", backref="restaurants", cascade= 'all, delete-orphan')
+    # pizzas= association_proxy('restaurant_pizzas','pizza')
     
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'address': self.address,
+            # 'pizza':[piza.to_dict() for piza in  self.pizzas]
             # 'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             # 'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
         }
@@ -48,19 +51,22 @@ class Restaurant(db.Model, SerializerMixin):
 
 class Pizza(db.Model, SerializerMixin):
     __tablename__ = "pizzas"
+    
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String)
     ingredients= db.Column(db.String)
     created_at= db.Column(db.DateTime, server_default=db.func.now())
     updated_at= db.Column(db.DateTime, onupdate=db.func.now())
     
-    restaurant_pizzas = db.relationship("RestaurantPizza", backref="pizzas")
+    restaurant_pizzas = db.relationship("RestaurantPizza", backref="pizzas", cascade= 'all, delete-orphan')
+    # restaurants = association_proxy('restaurant_pizzas', 'restaurant')
     
     def to_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'ingredients': self.ingredients,
+            # 'pizza':[rest.to_dict() for rest in  self.restaurants]
             # 'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             # 'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None
         }
@@ -75,9 +81,12 @@ class RestaurantPizza(db.Model, SerializerMixin):
     created_at= db.Column(db.DateTime, server_default=db.func.now())
     updated_at= db.Column(db.DateTime, onupdate=db.func.now())
     
-    pizza_id= db.Column(db.Integer, db.ForeignKey("pizzas.id"))
+    pizza_id= db.Column('pizza_id', db.Integer, db.ForeignKey("pizzas.id"))    
+    restaurants_id= db.Column('restaurants_id', db.Integer, db.ForeignKey("restaurants.id"))
     
-    restaurants_id= db.Column(db.Integer, db.ForeignKey("restaurants.id"))
+    pizza = db.relationship('Pizza',back_populates='restaurant_pizzas')
+    restaurant = db.relationship('Restaurant',back_populates='restaurant_pizzas')
+    
     
     def to_dict(self):
         return {

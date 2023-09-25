@@ -1,9 +1,6 @@
 from models import db, Restaurant, RestaurantPizza, Pizza
-
 from faker import Faker
-
 import random
-
 from app import app
 
 
