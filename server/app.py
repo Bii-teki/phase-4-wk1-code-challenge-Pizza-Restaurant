@@ -1,9 +1,11 @@
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, Markup, render_template
 from flask_migrate import Migrate
 from flask_restful import Api, Resource
-from .models import db, Restaurant, Pizza, RestaurantPizza
+from models import db, Restaurant, Pizza, RestaurantPizza
 from flask import jsonify
 import random
+
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza_rest.db'
@@ -20,6 +22,8 @@ class Index(Resource):
             "index": "Welcome to the Pizza Restaurant RESTful API",
         }
         return jsonify(response_dict)
+    
+       
 
 api.add_resource(Index, '/')
 
