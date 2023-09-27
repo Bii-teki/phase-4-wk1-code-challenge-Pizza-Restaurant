@@ -5,12 +5,37 @@ from models import db, Restaurant, Pizza, RestaurantPizza
 from flask import jsonify
 import random
 
+from flask_swagger_ui import get_swaggerui_blueprint
+
 
 
 app = Flask(__name__)
+SWAGGER_URL = '/api/docs'  # URL for exposing Swagger UI (without trailing '/')
+API_URL = '/static/swagger.json'  # Our API url (can of course be a local resource)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///pizza_rest.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+
+
+
+# Call factory function to create our blueprint
+swaggerui_blueprint = get_swaggerui_blueprint(
+    SWAGGER_URL,  # Swagger UI static files will be mapped to '{SWAGGER_URL}/dist/'
+    API_URL,
+    config={  # Swagger UI config overrides
+        'app_name': "Test application"
+    },
+    # oauth_config={  # OAuth config. See https://github.com/swagger-api/swagger-ui#oauth2-configuration .
+    #    'clientId': "your-client-id",
+    #    'clientSecret': "your-client-secret-if-required",
+    #    'realm': "your-realms",
+    #    'appName': "your-app-name",
+    #    'scopeSeparator': " ",
+    #    'additionalQueryStringParams': {'test': "hello"}
+    # }
+)
+
+app.register_blueprint(swaggerui_blueprint)
 migrate = Migrate(app, db)
 db.init_app(app)
 
@@ -210,4 +235,4 @@ api.add_resource(RestaurantPizzaResource, '/restaurantpizzas')
 
 
 if __name__ == "__main__":
-    app.run(port=5578, debug=True)
+    app.run(port=5555, debug=True)
