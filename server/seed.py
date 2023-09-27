@@ -37,7 +37,7 @@ with app.app_context():
     restaurant_pizza =[]
     for i in range(20):
         restaurant_pizzas = RestaurantPizza(
-            price= random.randint(300, 1000),
+            price= random.randint(1, 30),
             pizza_id = random.choice(pizzas).id,
             restaurants_id =random.choice(restaurants).id,
         )

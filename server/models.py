@@ -110,7 +110,6 @@ class RestaurantPizza(db.Model, SerializerMixin):
     
     
     
-    
 
 
 

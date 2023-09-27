@@ -44,8 +44,11 @@ class RestaurantResource(Resource):
                 "pizzas": pizza_dict
             }
             restaurant_list.append(restaurant_dict)
+            
+        print('Fetched data:', restaurant_list)    
 
         return make_response(jsonify({'restaurants': restaurant_list}), 200)
+    
 
 
     
@@ -98,7 +101,7 @@ api.add_resource(RestaurantByID, '/restaurants/<int:id>')
 
 class PizzaResource(Resource):
     def get(self):
-        pizzas = [pizza.to_dict() for pizza in Restaurant.query.all()]
+        pizzas = [pizza.to_dict() for pizza in Pizza.query.all()]
         return jsonify({'pizzas': pizzas})
 
     def post(self):
